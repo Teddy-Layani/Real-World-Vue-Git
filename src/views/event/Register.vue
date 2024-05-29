@@ -1,39 +1,27 @@
 <script setup>
-import EventService from '@/services/EventService.js'
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { defineProps, inject } from "vue";
 
-const route = useRoute()
-const event = ref(null)
-const props = defineProps({
-  id:{
-    required: true,
-  }
-})
+const { event } = defineProps(['event'])
+const router = useRouter()
+const GStore = inject('GStore')
 
-onMounted(() => {
-  EventService.getEvent(props.id)
-    .then(response => {
-      event.value = response.data
+const register = () => {
+    // Call to API
+    // If registered then redirect to event details page
+    GStore.flashMessage = 'You are successfully registered for ' + event.title
+    setTimeout(() => {
+        GStore.flashMessage = ''
+    }, 3000)
+
+    router.push({
+        name: 'EventDetails',
     })
-    .catch(error => {
-      console.log(error)
-    })
-})
+}
+
 </script>
 <template>
-  <div v-if="event">
-    <h1>{{ event.title }}</h1>
-    <div id="nav">
-        <router-link :to="{ name: 'EventDetails', params: { id } }"
-        >Details</router-link>
-      |
-      <router-link :to="{ name: 'EventRegister', params: { id } }"
-        >Register</router-link>
-      |
-      <router-link :to="{ name: 'EventEdit', params: { id } }"
-        >Edit</router-link>
-    </div>
-    <p>Registration form here</p>
-  </div>
+    <p>Register for the event here</p>
+    <!-- <button @click="$emit('register')">Register</button> -->
+    <button @click="register">Register Me!</button>
 </template>
